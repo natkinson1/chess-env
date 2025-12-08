@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include "pieces.cpp"
 
 std::vector<std::vector<std::vector<int>>> boardPieces = {
     // -1 represents no pieces on that square
@@ -52,7 +53,12 @@ class Board {
 private:
     std::vector<std::vector<std::vector<int>>> boardPieces;
 public:
-    std::vector<int> getPiece(const std::vector<int>& position) const {
-        return boardPieces[position[0]][position[1]];
-    };
+
+    std::vector<std::unique_ptr<Piece>> reset() {
+        std::vector<std::unique_ptr<Piece>> startingBoard;
+
+        startingBoard.push_back(std::make_unique<Pawn>(std::vector<int>{6,0}, 1));
+
+        return startingBoard;
+    }
 };
