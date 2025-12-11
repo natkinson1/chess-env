@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <tuple>
+#include "environment.h"
 #include "pieces.h"
 
 std::unordered_map<std::string, int> player = {
@@ -33,18 +34,18 @@ std::vector<std::vector<int>> boardPieces = {
     {4, 3, 2, 5, 6, 2, 3, 4},
 };
 
-std::vector<std::vector<std::vector<int>>> boardPieces = {
-    // -1 represents no pieces on that square
-    // [pieceEncoding, player]
-    {{4,-1},{3,-1},{2,-1},{5,-1},{6,-1},{2,-1},{3,-1},{4,-1}},
-    {{1,-1},{1,-1},{1,-1},{1,-1},{1,-1},{1,-1},{1,-1},{1,-1}},
-    {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
-    {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
-    {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
-    {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
-    {{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1}},
-    {{4,1},{3,1},{2,1},{5,1},{6,1},{2,1},{3,1},{4,1}},
-};
+// std::vector<std::vector<std::vector<int>>> boardPieces = {
+//     // -1 represents no pieces on that square
+//     // [pieceEncoding, player]
+//     {{4,-1},{3,-1},{2,-1},{5,-1},{6,-1},{2,-1},{3,-1},{4,-1}},
+//     {{1,-1},{1,-1},{1,-1},{1,-1},{1,-1},{1,-1},{1,-1},{1,-1}},
+//     {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
+//     {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
+//     {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
+//     {{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}},
+//     {{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1},{1,1}},
+//     {{4,1},{3,1},{2,1},{5,1},{6,1},{2,1},{3,1},{4,1}},
+// };
 
 std::vector<std::vector<std::vector<int>>> board = {
     {{0,0}, {0,1}, {0,2}, {0,3}, {0,4}, {0,5}, {0,6}, {0,7}},
@@ -57,43 +58,23 @@ std::vector<std::vector<std::vector<int>>> board = {
     {{7,0}, {7,1}, {7,2}, {7,3}, {7,4}, {7,5}, {7,6}, {7,7}},
 };
 
-// state must be boardEncoding + list of piececlass
+std::vector<std::unique_ptr<Piece>>& Environment::reset() {
+    this->pieces.clear();
+    
+    this->pieces = this->board.reset();
 
-struct State {
-    std::vector<std::vector<int>> board;
-    std::vector<std::unique_ptr<Piece>> pieces;
-};
+    return this->pieces;
+}
 
-
-class Environment {
-private:
-    State state;
-    std::vector<std::vector<int>> board;
-    std::vector<std::unique_ptr<Piece>> pieces;
-public:
-    void movePiece() {};
-
-    void step() {};
-
-    std::vector<std::unique_ptr<Piece>> reset() {
-        std::vector<std::unique_ptr<Piece>> startingBoard;
-
-        startingBoard.push_back(std::make_unique<Pawn>(std::vector<int>{6,0}, 1));
-
-        return startingBoard;
+std::vector<std::vector<std::vector<int>>> Environment::getActions() {
+    std::vector<std::vector<std::vector<int>>> allMoves;
+    for (const auto& piece : this->pieces){
+        std::vector<std::vector<std::vector<int>>> pieceMoves = piece->getMoves(this->board);
+        allMoves.insert(
+            allMoves.end(),
+            pieceMoves.begin(),
+            pieceMoves.end()
+        );
     }
-
-    std::vector<std::vector<std::vector<int>>> getActions() {
-        std::vector<std::vector<std::vector<int>>> allMoves;
-        for (const auto& piece : pieces){
-            std::vector<std::vector<std::vector<int>>> pieceMoves = piece->getMoves(board);
-            
-        }
-    }
-
-    std::tuple<int, int> getPiece(const std::vector<int>& position) const {
-        int piece = board[position[0]][position[1]];
-        int pieceColour = (piece > 0) ? 1 : ((piece < 0) ? -1 : 0);
-        return {piece, pieceColour};
-    };
-};
+    return allMoves;
+}
