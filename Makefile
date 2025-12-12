@@ -17,5 +17,15 @@ pieces.o: pieces.cpp pieces.h
 environment.o: environment.cpp environment.h
 	g++ -c environment.cpp -g
 
+# Test target
+test: tests/test_runner
+	./tests/test_runner
+
+tests/test.o: tests/testPieces.cpp environment.h
+	g++ -c tests/testPieces.cpp -o tests/test.o -g
+
+tests/test_runner: tests/test.o board.o pieces.o environment.o
+	g++ tests/test.o board.o pieces.o environment.o -o test_runner
+
 clean:
 	rm -f *.o main

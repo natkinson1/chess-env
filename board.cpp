@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 #include "pieces.h"
 #include "board.h"
 
@@ -39,29 +40,114 @@
 //     {{7,0}, {7,1}, {7,2}, {7,3}, {7,4}, {7,5}, {7,6}, {7,7}},
 // };
 
-// std::vector<std::vector<int>> board = {
-//     {0, 1, 2, 3, 4, 5, 6, 7},
-//     {8, 9, 10,11,12,13,14,15},
-//     {16,17,18,19,20,21,22,23},
-//     {24,25,26,27,28,29,30,31},
-//     {32,33,34,35,36,37,38,39},
-//     {40,41,42,43,44,45,46,47},
-//     {48,49,50,51,52,53,54,55},
-//     {56,57,58,59,60,61,62,63},
-// };
+boardEncoding Board::reset() {
+    pieceList p;
 
-std::vector<std::unique_ptr<Piece>> Board::reset() {
-    std::vector<std::unique_ptr<Piece>> pieceList;
+    this->board.encoding = this->startingBoard;
+    p.pieces = {
+        // white pieces
+        std::make_unique<Pawn>(Position{6,0}, 1, false),
+        std::make_unique<Pawn>(Position{6,1}, 1, false),
+        std::make_unique<Pawn>(Position{6,2}, 1, false),
+        std::make_unique<Pawn>(Position{6,3}, 1, false),
+        std::make_unique<Pawn>(Position{6,4}, 1, false),
+        std::make_unique<Pawn>(Position{6,5}, 1, false),
+        std::make_unique<Pawn>(Position{6,6}, 1, false),
+        std::make_unique<Pawn>(Position{6,7}, 1, false),
+        std::make_unique<Rook>(Position{7,0}, 1, false),
+        std::make_unique<Knight>(Position{7,1}, 1),
+        std::make_unique<Bishop>(Position{7,2}, 1),
+        std::make_unique<Queen>(Position{7,3}, 1),
+        std::make_unique<King>(Position{7,4}, 1, false),
+        std::make_unique<Bishop>(Position{7,5}, 1),
+        std::make_unique<Knight>(Position{7,6}, 1),
+        std::make_unique<Rook>(Position{7,7}, 1, false),
+        //black pieces
+        std::make_unique<Pawn>(Position{1,0}, -1, false),
+        std::make_unique<Pawn>(Position{1,1}, -1, false),
+        std::make_unique<Pawn>(Position{1,2}, -1, false),
+        std::make_unique<Pawn>(Position{1,3}, -1, false),
+        std::make_unique<Pawn>(Position{1,4}, -1, false),
+        std::make_unique<Pawn>(Position{1,5}, -1, false),
+        std::make_unique<Pawn>(Position{1,6}, -1, false),
+        std::make_unique<Pawn>(Position{1,7}, -1, false),
+        std::make_unique<Rook>(Position{0,0}, -1, false),
+        std::make_unique<Knight>(Position{0,1}, -1),
+        std::make_unique<Bishop>(Position{0,2}, -1),
+        std::make_unique<Queen>(Position{0,3}, -1),
+        std::make_unique<King>(Position{0,4}, -1, false),
+        std::make_unique<Bishop>(Position{0,5}, -1),
+        std::make_unique<Knight>(Position{0,6}, -1),
+        std::make_unique<Rook>(Position{0,7}, -1, false),
+    };
+    this->pieces = p;
 
-    this->board = this->startingBoard;
-    pieceList.push_back(std::make_unique<Pawn>(std::vector<int>{4,4}, 1));
+    return this->board;
+};
 
-    return pieceList;
+moveList Board::getActions(int player) {
+    moveList allMoves;
+    for (const auto& piece : this->pieces){
+        if (piece->colour == player) {
+            moveList pieceMoves = piece->getMoves(*this);
+            allMoves.moves.insert(
+                allMoves.moves.end(),
+                pieceMoves.moves.begin(),
+                pieceMoves.moves.end()
+            );
+        } else {
+            continue;
+        }
+    }
+    return allMoves;
+};
+
+std::tuple<pieceList,boardEncoding> Board::moveTemp(Move move) {
+    for (const auto& piece : this->pieces) {
+        if (piece->position == move.from) {
+
+        }
+    }
+};
+
+bool Board::isLegalMove(Move move, int player) {
+    // check if move causes piece to be in check.
+    boardEncoding tempBoard = this->board;
+    tempBoard[move[1][0]][move[1][1]] = tempBoard[move[0][0]][move[0][1]];
+    tempBoard[move[0][0]][move[0][1]] = 0;
+    // check to see if other player can take king.
+    int target = 6 * player;
+    std::vector<int> kingPosition;
+    for ( const auto& piece : this->pieces) {
+        if (piece->encoding == target) {
+            kingPosition = piece->position;
+        } else {
+            continue;
+        }
+    }
+    std::vector<std::vector<std::vector<int>>> allMoves;
+
+
+
 }
 
 std::tuple<int, int> Board::getPiece(const std::vector<int>& position) const {
-    std::cout << "Board size: " << this->board.size() << std::endl;
-    int piece = this->board[position[0]][position[1]];
+    int piece = this->board.at(position[0]).at(position[1]);
     int pieceColour = (piece > 0) ? 1 : ((piece < 0) ? -1 : 0);
     return {piece, pieceColour};
 };
+
+void Board::clearBoard() {
+    this->board = this->emptyBoard;
+    std::cout << "Board size after clear: " << this->board.size() << std::endl;
+}
+
+void Board::arrangeBoard(std::vector<std::unique_ptr<Piece>>& pieces) {
+    this->clearBoard();
+    for (auto& piece : pieces) {
+        int row = piece->position[0];
+        int col = piece->position[1];
+        int idx = piece->encoding;
+        this->board.at(row).at(col) = idx;
+    }
+}

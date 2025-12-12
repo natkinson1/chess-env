@@ -58,23 +58,15 @@ std::vector<std::vector<std::vector<int>>> board = {
     {{7,0}, {7,1}, {7,2}, {7,3}, {7,4}, {7,5}, {7,6}, {7,7}},
 };
 
-std::vector<std::unique_ptr<Piece>>& Environment::reset() {
-    this->pieces.clear();
+std::tuple<std::vector<std::vector<int>>, int> Environment::reset() {
     
-    this->pieces = this->board.reset();
+    std::vector<std::vector<int>> state = this->board.reset();
 
-    return this->pieces;
+    return {state, 1};
 }
 
-std::vector<std::vector<std::vector<int>>> Environment::getActions() {
-    std::vector<std::vector<std::vector<int>>> allMoves;
-    for (const auto& piece : this->pieces){
-        std::vector<std::vector<std::vector<int>>> pieceMoves = piece->getMoves(this->board);
-        allMoves.insert(
-            allMoves.end(),
-            pieceMoves.begin(),
-            pieceMoves.end()
-        );
-    }
-    return allMoves;
+void Environment::loadState(std::vector<std::unique_ptr<Piece>>& pieces) {
+    this->pieces.clear();
+    this->pieces = std::move(pieces);
+    this->board.arrangeBoard(this->pieces);
 }

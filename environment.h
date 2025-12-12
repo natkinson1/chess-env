@@ -11,8 +11,9 @@ private:
     Board board;
     std::vector<std::unique_ptr<Piece>> pieces;
 public:
-    std::vector<std::unique_ptr<Piece>>& reset();
-    std::vector<std::vector<std::vector<int>>> getActions();
+    std::tuple<std::vector<std::vector<int>>, int> reset();
+    std::vector<std::vector<std::vector<int>>> getActions(int player);
+    void loadState(std::vector<std::unique_ptr<Piece>>& pieces);
 };
 
 #endif
