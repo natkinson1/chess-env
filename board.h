@@ -80,6 +80,7 @@ public:
     pieceList moveTemp(Move move);
     void clearBoard();
     void arrangeBoard(pieceList& pieces);
+    bool Board::inCheck(int player, pieceList pieces);
 };
 
 #endif

@@ -127,7 +127,7 @@ bool Board::isLegalMove(Move move, int player) {
 
     int target = 6 * player;
     Position kingPosition;
-    for ( const auto& piece : this->pieces) {
+    for (const auto& piece : this->pieces) {
         if (piece->encoding == target) {
             kingPosition = piece->position;
         } else {
@@ -135,15 +135,28 @@ bool Board::isLegalMove(Move move, int player) {
         }
     }
     pieceList pieces = this->moveTemp(move);
-    moveList allMoves = this->getActions(player * -1, pieces);
+    bool inCheck = this->inCheck(player, pieces);
+    
+    return inCheck;
+}
 
+bool Board::inCheck(int player, pieceList pieces) {
+    int kingEncoding = 6 * player;
+    Position kingPosition;
+    for (const auto& piece : this->pieces) {
+        if (piece->encoding == kingEncoding) {
+            kingPosition = piece->position;
+        } else {
+            continue;
+        }
+    }
+    moveList allMoves = this->getActions(player * -1, pieces);
     for (auto& move : allMoves) {
         if (move.to == kingPosition) {
             return false;
         }
     }
     return true;
-
 }
 
 std::tuple<int, int> Board::getPiece(const Position& position) const {
