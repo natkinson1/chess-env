@@ -41,10 +41,10 @@
 // };
 
 boardEncoding Board::reset() {
-    pieceList p;
+    pieceList pieces;
 
-    this->board.encoding = this->startingBoard;
-    p.pieces = {
+    this->board = this->startingBoard;
+    pieces = {
         // white pieces
         std::make_unique<Pawn>(Position{6,0}, 1, false),
         std::make_unique<Pawn>(Position{6,1}, 1, false),
@@ -80,20 +80,20 @@ boardEncoding Board::reset() {
         std::make_unique<Knight>(Position{0,6}, -1),
         std::make_unique<Rook>(Position{0,7}, -1, false),
     };
-    this->pieces = p;
+    this->pieces = pieces;
 
     return this->board;
 };
 
-moveList Board::getActions(int player) {
+moveList Board::getActions(int player, pieceList pieces) {
     moveList allMoves;
-    for (const auto& piece : this->pieces){
+    for (const auto& piece : pieces){
         if (piece->colour == player) {
             moveList pieceMoves = piece->getMoves(*this);
-            allMoves.moves.insert(
-                allMoves.moves.end(),
-                pieceMoves.moves.begin(),
-                pieceMoves.moves.end()
+            allMoves.insert(
+                allMoves.end(),
+                pieceMoves.begin(),
+                pieceMoves.end()
             );
         } else {
             continue;
@@ -102,22 +102,31 @@ moveList Board::getActions(int player) {
     return allMoves;
 };
 
-std::tuple<pieceList,boardEncoding> Board::moveTemp(Move move) {
-    for (const auto& piece : this->pieces) {
-        if (piece->position == move.from) {
+pieceList Board::moveTemp(Move move) {
 
-        }
-    }
+    pieceList pieces = this->pieces;
+
+    pieces.erase(
+        std::remove_if(pieces.begin(), pieces.end(), 
+            [move](Piece* x) { return x->position == move.to; }),
+        pieces.end()
+    );
+
+    for (auto& piece : pieces) {
+        if (piece->position == move.from) {
+            piece->position = move.to;
+        };
+    };
+
+    return pieces;
 };
 
 bool Board::isLegalMove(Move move, int player) {
     // check if move causes piece to be in check.
-    boardEncoding tempBoard = this->board;
-    tempBoard[move[1][0]][move[1][1]] = tempBoard[move[0][0]][move[0][1]];
-    tempBoard[move[0][0]][move[0][1]] = 0;
     // check to see if other player can take king.
+
     int target = 6 * player;
-    std::vector<int> kingPosition;
+    Position kingPosition;
     for ( const auto& piece : this->pieces) {
         if (piece->encoding == target) {
             kingPosition = piece->position;
@@ -125,28 +134,33 @@ bool Board::isLegalMove(Move move, int player) {
             continue;
         }
     }
-    std::vector<std::vector<std::vector<int>>> allMoves;
+    pieceList pieces = this->moveTemp(move);
+    moveList allMoves = this->getActions(player * -1, pieces);
 
-
+    for (auto& move : allMoves) {
+        if (move.to == kingPosition) {
+            return false;
+        }
+    }
+    return true;
 
 }
 
-std::tuple<int, int> Board::getPiece(const std::vector<int>& position) const {
-    int piece = this->board.at(position[0]).at(position[1]);
+std::tuple<int, int> Board::getPiece(const Position& position) const {
+    int piece = this->board.at(position.row).at(position.col);
     int pieceColour = (piece > 0) ? 1 : ((piece < 0) ? -1 : 0);
     return {piece, pieceColour};
 };
 
 void Board::clearBoard() {
     this->board = this->emptyBoard;
-    std::cout << "Board size after clear: " << this->board.size() << std::endl;
 }
 
-void Board::arrangeBoard(std::vector<std::unique_ptr<Piece>>& pieces) {
+void Board::arrangeBoard(pieceList& pieces) {
     this->clearBoard();
     for (auto& piece : pieces) {
-        int row = piece->position[0];
-        int col = piece->position[1];
+        int row = piece->position.row;
+        int col = piece->position.col;
         int idx = piece->encoding;
         this->board.at(row).at(col) = idx;
     }

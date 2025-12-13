@@ -27,19 +27,32 @@ struct Move {
     Position to;
 };
 
-struct moveList {
-    std::vector<Move> moves;
+struct moveList : public std::vector<Move> {
+    using std::vector<Move>::vector;
 };
 
-struct boardEncoding {
-    std::vector<std::vector<int>> encoding; 
+// struct moveList {
+//     std::vector<Move> moves;
+
+//     void push_back(const Move& move) {
+//         moves.push_back(move);
+//     }
+    
+//     // Optional: Add other useful methods
+//     size_t size() const { return moves.size(); }
+//     bool empty() const { return moves.empty(); }
+// };
+
+struct boardEncoding: public std::vector<std::vector<int>> {
+    using std::vector<std::vector<int>>::vector;
 };
 
 class Board {
 protected:
     boardEncoding board;
     pieceList pieces;
-    std::vector<std::vector<int>> startingBoard = {
+    pieceList takenPieces;
+    boardEncoding startingBoard = {
         {-4, -3, -2, -5, -6, -2, -3, -4},
         {-1, -1, -1, -1, -1, -1, -1, -1},
         {0, 0, 0, 0, 0, 0, 0, 0},
@@ -49,7 +62,7 @@ protected:
         {1, 1, 1, 1, 1, 1, 1, 1},
         {4, 3, 2, 5, 6, 2, 3, 4},
     };
-    std::vector<std::vector<int>> emptyBoard = {
+    boardEncoding emptyBoard = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
@@ -61,10 +74,10 @@ protected:
     };
 public:
     boardEncoding reset();
-    moveList getActions(int player);
+    moveList getActions(int player, pieceList pieces);
     bool isLegalMove(Move move, int player);
     std::tuple<int, int> getPiece(const Position& position) const;
-    std::tuple<pieceList, boardEncoding> moveTemp(Move move);
+    pieceList moveTemp(Move move);
     void clearBoard();
     void arrangeBoard(pieceList& pieces);
 };

@@ -12,14 +12,18 @@ class Piece;
 struct Position;
 struct moveList;
 
-struct pieceList {
-    std::vector<std::unique_ptr<Piece>> pieces;
-    auto begin() { return pieces.begin(); }
-    auto end() { return pieces.end();   }
-
-    auto begin() const {return pieces.begin();}
-    auto end() const {return pieces.end();}
+struct pieceList : public std::vector<std::unique_ptr<Piece>> {
+    using std::vector<std::unique_ptr<Piece>>::vector;
 };
+
+// struct pieceList {
+//     std::vector<std::unique_ptr<Piece>> pieces;
+//     auto begin() {return pieces.begin();}
+//     auto end() {return pieces.end();}
+
+//     auto begin() const {return pieces.begin();}
+//     auto end() const {return pieces.end();}
+// };
 
 class Piece {
 protected:

@@ -11,8 +11,8 @@ moveList Pawn::getMoves(const Board& board) const {
     moveList legalMoves;
 
     if (!hasMoved) {
-        const std::vector<int> coord1 = {position[0] + direction, position[1]};
-        const std::vector<int> coord2 = {position[0] + direction * 2, position[1]};
+        Position coord1 = {position.row + direction, position.col};
+        Position coord2 = {position.row + direction * 2, position.col};
         auto [piece1, pieceColour1] = board.getPiece(coord1);
         auto [piece2, pieceColour2] = board.getPiece(coord2);
         if (pieceColour1 == 0 && pieceColour2 == 0) {
@@ -20,14 +20,14 @@ moveList Pawn::getMoves(const Board& board) const {
         };
     };
     // can move 1 forward
-    const std::vector<int> forward = {position[0] + direction, position[1]};
+    Position forward = {position.row + direction, position.col};
     auto [piece, pieceColour] = board.getPiece(forward);
     if (pieceColour == 0) {
         legalMoves.push_back({position, forward});
     }
     // can take diagRight
-    const std::vector<int> rightDiag = {position[0] - direction, position[1] + 1};
-    if (rightDiag[0] > 0 && rightDiag[0] <= 7 && rightDiag[1] <= 7) {
+    Position rightDiag = {position.row - direction, position.col + 1};
+    if (rightDiag.row > 0 && rightDiag.row <= 7 && rightDiag.col <= 7) {
         auto [piece, pieceColour] = board.getPiece(rightDiag);
         if (pieceColour != colour && pieceColour != 0) {
             legalMoves.push_back({position, rightDiag});
@@ -35,8 +35,8 @@ moveList Pawn::getMoves(const Board& board) const {
     };
     
     // can take diagLeft
-    const std::vector<int> leftDiag = {position[0] - direction, position[1] - 1};
-    if (leftDiag[0] > 0 && leftDiag[0] < 8 && leftDiag[1] > 0) {
+    Position leftDiag = {position.row - direction, position.col - 1};
+    if (leftDiag.row > 0 && leftDiag.row < 8 && leftDiag.col > 0) {
         auto [piece, pieceColour] = board.getPiece(leftDiag);
         if (pieceColour != colour && pieceColour != 0) {
             legalMoves.push_back({position, leftDiag});
@@ -57,8 +57,8 @@ moveList Rook::getMoves(const Board& board) const {
     int i = 1;
     while (i <= 7) {
         // top
-        if (lookTop && position[0] - i >= 0) {
-            std::vector<int> coord = {position[0] - i, position[1]};
+        if (lookTop && position.row - i >= 0) {
+            Position coord = {position.row - i, position.col};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -72,8 +72,8 @@ moveList Rook::getMoves(const Board& board) const {
             lookTop = false;
         }
         // left
-        if (lookLeft && position[1] - i >= 0) {
-            std::vector<int> coord = {position[0], position[1] - i};
+        if (lookLeft && position.col - i >= 0) {
+            Position coord = {position.row, position.col - i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -87,8 +87,8 @@ moveList Rook::getMoves(const Board& board) const {
             lookLeft = false;
         }
         // right
-        if (lookRight && position[1] + i <= 7) {
-            std::vector<int> coord = {position[0], position[1] + i};
+        if (lookRight && position.col + i <= 7) {
+            Position coord = {position.row, position.col + i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -102,8 +102,8 @@ moveList Rook::getMoves(const Board& board) const {
             lookRight = false;
         }
         // bottom
-        if (lookBottom && position[0] + i <= 7) {
-            std::vector<int> coord = {position[0] + i, position[1]};
+        if (lookBottom && position.row + i <= 7) {
+            Position coord = {position.row + i, position.col};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -131,8 +131,8 @@ moveList Bishop::getMoves(const Board& board) const {
     int i = 1;
     while (i <= 7) {
         // top right
-        if (lookTopRight && position[0] - i >= 0 && position[1] + i <= 7) {
-            std::vector<int> coord = {position[0] - i, position[1] + i};
+        if (lookTopRight && position.row - i >= 0 && position.col + i <= 7) {
+            Position coord = {position.row - i, position.col + i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -146,8 +146,8 @@ moveList Bishop::getMoves(const Board& board) const {
             lookTopRight = false;
         }
         // top left
-        if (lookTopLeft && position[1] - i >= 0 && position[0] - i >= 0) {
-            std::vector<int> coord = {position[0] - i, position[1] - i};
+        if (lookTopLeft && position.col - i >= 0 && position.row - i >= 0) {
+            Position coord = {position.row - i, position.col - i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -161,8 +161,8 @@ moveList Bishop::getMoves(const Board& board) const {
             lookTopLeft = false;
         }
         // bottom right
-        if (lookBottomRight && position[1] + i <= 7 && position[0] + i <= 7) {
-            std::vector<int> coord = {position[0] + i, position[1] + i};
+        if (lookBottomRight && position.col + i <= 7 && position.row + i <= 7) {
+            Position coord = {position.row + i, position.col + i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -176,8 +176,8 @@ moveList Bishop::getMoves(const Board& board) const {
             lookBottomRight = false;
         }
         // bottom left
-        if (lookBottomLeft && position[0] + i <= 7 && position[1] - i >= 0) {
-            std::vector<int> coord = {position[0] + i, position[1] - i};
+        if (lookBottomLeft && position.row + i <= 7 && position.col - i >= 0) {
+            Position coord = {position.row + i, position.col - i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -210,8 +210,8 @@ moveList Queen::getMoves(const Board& board) const {
     int i = 1;
     while (i <= 7) {
         // top
-        if (lookTop && position[0] - i >= 0) {
-            std::vector<int> coord = {position[0] - i, position[1]};
+        if (lookTop && position.row - i >= 0) {
+            Position coord = {position.row - i, position.col};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -225,8 +225,8 @@ moveList Queen::getMoves(const Board& board) const {
             lookTop = false;
         }
         // left
-        if (lookLeft && position[1] - i >= 0) {
-            std::vector<int> coord = {position[0], position[1] - i};
+        if (lookLeft && position.col - i >= 0) {
+            Position coord = {position.row, position.col - i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -240,8 +240,8 @@ moveList Queen::getMoves(const Board& board) const {
             lookLeft = false;
         }
         // right
-        if (lookRight && position[1] + i <= 7) {
-            std::vector<int> coord = {position[0], position[1] + i};
+        if (lookRight && position.col + i <= 7) {
+            Position coord = {position.row, position.col + i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -255,8 +255,8 @@ moveList Queen::getMoves(const Board& board) const {
             lookRight = false;
         }
         // bottom
-        if (lookBottom && position[0] + i <= 7) {
-            std::vector<int> coord = {position[0] + i, position[1]};
+        if (lookBottom && position.row + i <= 7) {
+            Position coord = {position.row + i, position.col};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -271,8 +271,8 @@ moveList Queen::getMoves(const Board& board) const {
         }
 
         // top right
-        if (lookTopRight && position[0] - i >= 0 && position[1] + i <= 7) {
-            std::vector<int> coord = {position[0] - i, position[1] + i};
+        if (lookTopRight && position.row - i >= 0 && position.col + i <= 7) {
+            Position coord = {position.row - i, position.col + i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -286,8 +286,8 @@ moveList Queen::getMoves(const Board& board) const {
             lookTopRight = false;
         }
         // top left
-        if (lookTopLeft && position[1] - i >= 0 && position[0] - i >= 0) {
-            std::vector<int> coord = {position[0] - i, position[1] - i};
+        if (lookTopLeft && position.col - i >= 0 && position.row - i >= 0) {
+            Position coord = {position.row - i, position.col - i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -301,8 +301,8 @@ moveList Queen::getMoves(const Board& board) const {
             lookTopLeft = false;
         }
         // bottom right
-        if (lookBottomRight && position[1] + i <= 7 && position[0] + i <= 7) {
-            std::vector<int> coord = {position[0] + i, position[1] + i};
+        if (lookBottomRight && position.col + i <= 7 && position.row + i <= 7) {
+            Position coord = {position.row + i, position.col + i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -316,8 +316,8 @@ moveList Queen::getMoves(const Board& board) const {
             lookBottomRight = false;
         }
         // bottom left
-        if (lookBottomLeft && position[0] + i <= 7 && position[1] - i >= 0) {
-            std::vector<int> coord = {position[0] + i, position[1] - i};
+        if (lookBottomLeft && position.row + i <= 7 && position.col - i >= 0) {
+            Position coord = {position.row + i, position.col - i};
             auto [piece, pieceColour] = board.getPiece(coord);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, coord});
@@ -339,20 +339,20 @@ moveList Knight::getMoves(const Board& board) const {
     // returns [from, to] coordinates defining the new move.
     // check if move leads to king being in check.
     moveList legalMoves;
-    std::vector<int> topRight = {position[0] - 2, position[1] + 1};
-    std::vector<int> topLeft = {position[0] - 2, position[1] - 1};
-    std::vector<int> rightTop = {position[0] - 1, position[1] + 2};
-    std::vector<int> rightBottom = {position[0] + 1, position[1] + 2};
-    std::vector<int> bottomRight = {position[0] + 2, position[1] + 1};
-    std::vector<int> bottomLeft = {position[0] + 2, position[1] + 1};
-    std::vector<int> leftTop = {position[0] + 1, position[1] - 2};
-    std::vector<int> leftBottom = {position[0] - 1, position[1] - 2};
-    std::vector<std::vector<int>> allMoves = {
+    Position topRight = Position{position.row - 2, position.col + 1};
+    Position topLeft = {position.row - 2, position.col - 1};
+    Position rightTop = {position.row - 1, position.col + 2};
+    Position rightBottom = {position.row + 1, position.col + 2};
+    Position bottomRight = {position.row + 2, position.col + 1};
+    Position bottomLeft = {position.row + 2, position.col + 1};
+    Position leftTop = {position.row + 1, position.col - 2};
+    Position leftBottom = {position.row - 1, position.col - 2};
+    std::vector<Position> allMoves = {
         topRight, topLeft, rightTop, rightBottom, bottomRight, bottomLeft, leftTop, leftBottom
     };
 
-    for (Move move : allMoves) {
-        if (move[0] >= 0 && move[0] <= 7 && move[1] >= 0 && move[1] <= 7) {
+    for (Position move : allMoves) {
+        if (move.row >= 0 && move.row <= 7 && move.col >= 0 && move.col <= 7) {
             auto [piece, pieceColour] = board.getPiece(move);
             if (piece == 0) {
                 legalMoves.push_back({position, move});
@@ -369,20 +369,20 @@ moveList King::getMoves(const Board& board) const {
     // returns [from, to] coordinates defining the new move.
     // check if move leads to king being in check.
     moveList legalMoves;
-    std::vector<int> top = {position[0] - 1, position[1]};
-    std::vector<int> right = {position[0], position[1] + 1};
-    std::vector<int> left = {position[0], position[1] - 1};
-    std::vector<int> bottom = {position[0] + 1, position[1]};
-    std::vector<int> topRight = {position[0] - 1, position[1] + 1};
-    std::vector<int> topLeft = {position[0] - 1, position[1] - 1};
-    std::vector<int> bottomRight = {position[0] + 1, position[1] + 1};
-    std::vector<int> bottomLeft = {position[0] + 1, position[1] + 1};
-    std::vector<std::vector<int>> allMoves = {
+    Position top = {position.row - 1, position.col};
+    Position right = {position.row, position.col + 1};
+    Position left = {position.row, position.col - 1};
+    Position bottom = {position.row + 1, position.col};
+    Position topRight = {position.row - 1, position.col + 1};
+    Position topLeft = {position.row - 1, position.col - 1};
+    Position bottomRight = {position.row + 1, position.col + 1};
+    Position bottomLeft = {position.row + 1, position.col + 1};
+    std::vector<Position> allMoves = {
         top, right, left, bottom, topRight, topLeft, bottomRight, bottomLeft
     };
 
-    for (std::vector<int> move : allMoves) {
-        if (move[0] >= 0 && move[0] <= 7 && move[1] >= 0 && move[1] <= 7) {
+    for (Position move : allMoves) {
+        if (move.row >= 0 && move.row <= 7 && move.col >= 0 && move.col <= 7) {
             auto [piece, pieceColour] = board.getPiece(move);
             if (pieceColour == 0) {
                 legalMoves.push_back({position, move});
