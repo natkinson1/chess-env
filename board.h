@@ -13,23 +13,7 @@ struct State {
     std::vector<std::vector<int>> board;
 };
 
-struct Position {
-    int row;
-    int col;
 
-    bool operator==(const Position& other) const {
-        return row == other.row && col == other.col;
-    }
-};
-
-struct Move {
-    Position from;
-    Position to;
-};
-
-struct moveList : public std::vector<Move> {
-    using std::vector<Move>::vector;
-};
 
 // struct moveList {
 //     std::vector<Move> moves;
@@ -74,13 +58,14 @@ protected:
     };
 public:
     boardEncoding reset();
-    moveList getActions(int player, pieceList pieces);
+    moveList getActions(int player);
     bool isLegalMove(Move move, int player);
     std::tuple<int, int> getPiece(const Position& position) const;
-    pieceList moveTemp(Move move);
+    void move(Move move);
+    void undoMove(Move move);
     void clearBoard();
     void arrangeBoard(pieceList& pieces);
-    bool Board::inCheck(int player, pieceList pieces);
+    bool inCheck(int player);
 };
 
 #endif

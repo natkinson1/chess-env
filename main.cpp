@@ -7,6 +7,6 @@ int main() {
 
     auto [state, player] = env.reset();
 
-
+    
 
 }
