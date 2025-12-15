@@ -8,9 +8,9 @@
 
 class Environment {
 private:
+public:
     Board board;
     pieceList pieces;
-public:
     std::tuple<std::vector<std::vector<int>>, int> reset();
     void loadState(pieceList& pieces);
 };

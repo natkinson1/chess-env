@@ -58,11 +58,15 @@ protected:
     };
 public:
     boardEncoding reset();
-    moveList getActions(int player);
-    bool isLegalMove(Move move, int player);
-    std::tuple<int, int> getPiece(const Position& position) const;
-    void move(Move move);
-    void undoMove(Move move);
+    moveList getMoves(int player);
+    moveList getAllActions(int player);
+    moveList getLegalActions(moveList moves, int player);
+    bool isLegalMove(Move& move, int player);
+    Piece* getPiece(const Position& position) const;
+    void move(Move& move);
+    void undoMove(Move& move);
+    moveList castlingMoves(int player);
+    Piece* getKing(int player);
     void clearBoard();
     void arrangeBoard(pieceList& pieces);
     bool inCheck(int player);

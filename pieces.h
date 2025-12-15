@@ -22,6 +22,10 @@ struct Move {
     Position from;
     Position to;
     int newEncoding; // when a pawn promotes
+    int pieceTakenId = -1;
+    bool castleQS = false;
+    bool castleKS = false;
+    // std::unique_ptr<Piece> pieceTaken; // the piece it took.
 };
 
 struct moveList : public std::vector<Move> {
@@ -44,11 +48,13 @@ struct pieceList {
 class Piece {
 protected:
 public:
+    int id;
     Position position;
     int encoding;
     int colour;
     bool taken = false;
-    virtual moveList getMoves(const Board& board) const = 0;
+    bool hasMoved = false;
+    virtual moveList getMoves(Board& board) = 0;
     virtual ~Piece() = default;
 };
 
@@ -59,14 +65,15 @@ private:
     bool hasMoved;
     int direction;
 public:
-    Pawn(Position pos, int colour, bool hasMoved):
+    Pawn(Position pos, int colour, bool hasMoved, int id):
     direction(colour * -1) {
         this->position = pos;
         this->colour = colour;
         this->hasMoved = hasMoved;
         this->encoding = 1 * colour;
+        this->id = id;
     };
-    moveList getMoves(const Board& board) const override;
+    moveList getMoves(Board& board) override;
 };
 
 class Rook : public Piece {
@@ -74,61 +81,64 @@ private:
     int encoding = 4;
     bool hasMoved;
 public:
-    Rook(Position pos, int colour, bool hasMoved) {
+    Rook(Position pos, int colour, bool hasMoved, int id) {
         this->position = pos;
         this->colour = colour;
         this->hasMoved = hasMoved;
         this->encoding = 4 * colour;
+        this->id = id;
     };
-    moveList getMoves(const Board& board) const override;
+    moveList getMoves(Board& board) override;
 };
 
 class Bishop : public Piece {
 private:
 public:
-    Bishop(Position pos, int colour) {
+    Bishop(Position pos, int colour, int id) {
         this->position = pos;
         this->colour = colour;
         this->encoding = 2 * colour;
-
-        std::cout << "Bishop created - encoding: " << this->encoding << std::endl;
+        this->id = id;
     };
-    moveList getMoves(const Board& board) const override;
+    moveList getMoves(Board& board) override;
 };
 
 class Queen : public Piece {
 private:
 public:
-    Queen(Position pos, int colour) {
+    Queen(Position pos, int colour, int id) {
         this->position = pos;
         this->colour = colour;
         this->encoding = 5 * colour;
+        this->id = id;
     };
-    moveList getMoves(const Board& board) const override;
+    moveList getMoves(Board& board) override;
 };
 
 class Knight : public Piece {
 private:
 public:
-    Knight(Position pos, int colour) {
+    Knight(Position pos, int colour, int id) {
         this->position = pos;
         this->colour = colour;
         this->encoding = 3 * colour;
+        this->id = id;
     };
-    moveList getMoves(const Board& board) const override;
+    moveList getMoves(Board& board) override;
 };
 
 class King : public Piece {
 private:
     bool hasMoved;
 public:
-    King(Position pos, int colour, bool hasMoved) {
+    King(Position pos, int colour, bool hasMoved, int id) {
         this->position = pos;
         this->colour = colour;
         this->hasMoved = hasMoved;
         this->encoding = 6 * colour;
+        this->id = id;
     };
-    moveList getMoves(const Board& board) const override;
+    moveList getMoves(Board& board) override;
 
 };
 
