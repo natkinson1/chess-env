@@ -50,15 +50,13 @@ protected:
 public:
     int id;
     Position position;
-    int encoding;
+    int encoding = -1000;
     int colour;
     bool taken = false;
     bool hasMoved = false;
     virtual moveList getMoves(Board& board) = 0;
     virtual ~Piece() = default;
 };
-
-
 
 class Pawn : public Piece {
 private:
@@ -78,7 +76,6 @@ public:
 
 class Rook : public Piece {
 private:
-    int encoding = 4;
     bool hasMoved;
 public:
     Rook(Position pos, int colour, bool hasMoved, int id) {

@@ -16,21 +16,22 @@ moveList Pawn::getMoves(Board& board) {
         Piece* piece1 = board.getPiece(coord1);
         Piece* piece2 = board.getPiece(coord2);
         Move move = {.from=position, .to=coord2};
-        if (piece1->colour == 0 && piece2->colour == 0) {
+        if (piece1 == nullptr && piece2 == nullptr) {
             legalMoves.push_back({position, coord2});
         };
     };
     // can move 1 forward
     Position forward = {this->position.row + direction, this->position.col};
     Piece* piece = board.getPiece(forward);
-    if (piece->colour == 0) {
+    if (piece == nullptr) {
         legalMoves.push_back({position, forward});
     }
     // can take diagRight
     Position rightDiag = {this->position.row - direction, this->position.col + 1};
     if (rightDiag.row > 0 && rightDiag.row <= 7 && rightDiag.col <= 7) {
         Piece* piece = board.getPiece(rightDiag);
-        if (piece->colour != this->colour && piece != nullptr) {
+        if (piece == nullptr) {
+        } else if (piece->colour != this->colour) {
             legalMoves.push_back({position, rightDiag});
         };
     };
@@ -39,7 +40,8 @@ moveList Pawn::getMoves(Board& board) {
     Position leftDiag = {this->position.row - direction, this->position.col - 1};
     if (leftDiag.row > 0 && leftDiag.row < 8 && leftDiag.col > 0) {
         Piece* piece = board.getPiece(leftDiag);
-        if (piece->colour != this->colour && piece != nullptr) {
+        if (piece == nullptr) {
+        } else if (piece->colour != this->colour) {
             legalMoves.push_back({position, leftDiag});
         }
     }
