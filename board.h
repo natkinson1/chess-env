@@ -63,8 +63,8 @@ public:
     moveList getLegalActions(moveList moves, int player);
     bool isLegalMove(Move& move, int player);
     Piece* getPiece(const Position& position) const;
-    void move(Move& move);
-    void undoMove(Move& move);
+    void move(Move& move, int player);
+    void undoMove(Move& move, int player);
     moveList castlingMoves(int player);
     Piece* getKing(int player);
     void clearBoard();

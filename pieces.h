@@ -25,16 +25,12 @@ struct Move {
     int pieceTakenId = -1;
     bool castleQS = false;
     bool castleKS = false;
-    // std::unique_ptr<Piece> pieceTaken; // the piece it took.
+    bool hasMoved; // store if piece has previously moved.
 };
 
 struct moveList : public std::vector<Move> {
     using std::vector<Move>::vector;
 };
-
-// struct pieceList : public std::vector<std::unique_ptr<Piece>> {
-//     using std::vector<std::unique_ptr<Piece>>::vector;
-// };
 
 struct pieceList {
     std::vector<std::unique_ptr<Piece>> pieces;

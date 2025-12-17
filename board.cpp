@@ -41,7 +41,9 @@
 // };
 
 boardEncoding Board::reset() {
-    this->board = this->startingBoard;
+    
+    this->pieces.pieces.clear();
+    this->pieces.pieces.reserve(32);
 
     // white pieces
     this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,0}, 1, false, 0));
@@ -53,12 +55,12 @@ boardEncoding Board::reset() {
     this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,6}, 1, false, 6));
     this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,7}, 1, false, 7));
     this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,0}, 1, false, 8));
-    // this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,1}, 1, 9));
-    // this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,2}, 1, 10));
-    // this->pieces.pieces.push_back(std::make_unique<Queen>(Position{7,3}, 1, 11));
+    this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,1}, 1, 9));
+    this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,2}, 1, 10));
+    this->pieces.pieces.push_back(std::make_unique<Queen>(Position{7,3}, 1, 11));
     this->pieces.pieces.push_back(std::make_unique<King>(Position{7,4}, 1, false, 12));
-    // this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,5}, 1, 13));
-    // this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,6}, 1, 14));
+    this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,5}, 1, 13));
+    this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,6}, 1, 14));
     this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,7}, 1, false, 15));
     // black pieces
     this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,0}, -1, false, 16));
@@ -122,52 +124,88 @@ moveList Board::getLegalActions(moveList moves, int player) {
     return legalMoves;
 }
 
-void Board::move(Move& move) {
+void Board::move(Move& move, int player) {
 
-    this->board[move.to.row][move.to.col] = this->board[move.from.row][move.from.col];
-    this->board[move.from.row][move.from.col] = 0;
+    // if move is castle KS
+    // if move is pawn promotion
+    // if move in enpassen
+    if (move.castleKS) {
+        int rank = (player == 1) ? 7 : 0;
+        Piece* king = this->getKing(player);
+        Piece* kingRook = this->getPiece(Position{.row=rank, .col=7});
 
-    for (auto& piece : pieces) {
-        //piece is taken
-        if (piece->position == move.to && !piece->taken) {
-            piece->taken = true;
-            move.pieceTakenId = piece->id;
-        }
-        if (piece->position == move.from && !piece->taken) {
-            piece->position = move.to;
+        king->position = Position{.row=rank, .col=6};
+        kingRook->position = Position{.row=rank, .col=5};
+
+    } else if (move.castleQS) {
+        int rank = (player == 1) ? 7 : 0;
+        Piece* king = this->getKing(player);
+        Piece* kingRook = this->getPiece(Position{.row=rank, .col=0});
+
+        king->position = Position{.row=rank, .col=2};
+        kingRook->position = Position{.row=rank, .col=3};
+
+    } else {
+        for (auto& piece : pieces) {
+            //piece is taken
+            if (piece->position == move.to && !piece->taken) {
+                piece->taken = true;
+                move.pieceTakenId = piece->id;
+            }
+            if (piece->position == move.from && !piece->taken) {
+                move.hasMoved = piece->hasMoved;
+                piece->position = move.to;
+                piece->hasMoved = true;
+            };
         };
-    };
+    }
+
+
+    
 };
 
-void Board::undoMove(Move& move) {
-    
-    this->board[move.from.row][move.from.col] = this->board[move.to.row][move.to.col];
-    if (move.pieceTakenId != -1) {
-        this->board[move.to.row][move.to.col] = move.pieceTakenId;
+void Board::undoMove(Move& move, int player) {
+
+    if (move.castleKS) {
+        int rank = (player == 1) ? 7 : 0;
+        Piece* king = this->getKing(player);
+        Piece* kingRook = this->getPiece(Position{.row=rank, .col=5});
+
+        king->position = Position{.row=rank, .col=4};
+        kingRook->position = Position{.row=rank, .col=7};
+
+    } else if (move.castleQS) {
+        int rank = (player == 1) ? 7 : 0;
+        Piece* king = this->getKing(player);
+        Piece* kingRook = this->getPiece(Position{.row=rank, .col=3});
+
+        king->position = Position{.row=rank, .col=4};
+        kingRook->position = Position{.row=rank, .col=7};
+
     } else {
-        this->board[move.to.row][move.to.col] = 0;
+        for (auto& piece : this->pieces) {
+            //undo piece taken
+            if (piece->id == move.pieceTakenId) {
+                piece->taken = false;
+                move.pieceTakenId = -1;
+            }
+            if (piece->position == move.to && !piece->taken) {
+                piece->position = move.from;
+                piece->hasMoved = move.hasMoved; // restore hasMoved state
+            };
+        };
     }
     
 
-    for (auto& piece : this->pieces) {
-        //undo piece taken
-        if (piece->id == move.pieceTakenId) {
-            piece->taken = false;
-            move.pieceTakenId = -1;
-        }
-        if (piece->position == move.to && !piece->taken) {
-            piece->position = move.from;
-        };
-    };
 };
 
 bool Board::isLegalMove(Move& move, int player) {
     // check if move causes piece to be in check.
     // check to see if other player can take king.
 
-    this->move(move);
+    this->move(move, player);
     bool inCheck = this->inCheck(player);
-    this->undoMove(move);
+    this->undoMove(move, player);
     
     return !inCheck;
 }

@@ -17,14 +17,14 @@ moveList Pawn::getMoves(Board& board) {
         Piece* piece2 = board.getPiece(coord2);
         Move move = {.from=position, .to=coord2};
         if (piece1 == nullptr && piece2 == nullptr) {
-            legalMoves.push_back({position, coord2});
+            legalMoves.push_back(Move{.from=position, .to=coord2});
         };
     };
     // can move 1 forward
-    Position forward = {this->position.row + direction, this->position.col};
-    Piece* piece = board.getPiece(forward);
+    Position coord = {this->position.row + direction, this->position.col};
+    Piece* piece = board.getPiece(coord);
     if (piece == nullptr) {
-        legalMoves.push_back({position, forward});
+        legalMoves.push_back(Move{.from=position, .to=coord});
     }
     // can take diagRight
     Position rightDiag = {this->position.row - direction, this->position.col + 1};
@@ -32,7 +32,7 @@ moveList Pawn::getMoves(Board& board) {
         Piece* piece = board.getPiece(rightDiag);
         if (piece == nullptr) {
         } else if (piece->colour != this->colour) {
-            legalMoves.push_back({position, rightDiag});
+            legalMoves.push_back(Move{.from=position, .to=rightDiag});
         };
     };
     
@@ -42,7 +42,7 @@ moveList Pawn::getMoves(Board& board) {
         Piece* piece = board.getPiece(leftDiag);
         if (piece == nullptr) {
         } else if (piece->colour != this->colour) {
-            legalMoves.push_back({position, leftDiag});
+            legalMoves.push_back(Move{.from=position, .to=leftDiag});
         }
     }
     // en passen
@@ -64,9 +64,9 @@ moveList Rook::getMoves(Board& board) {
             Position coord = {this->position.row - i, this->position.col};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookTop = false;
             } else {
                 lookTop = false;
@@ -79,9 +79,9 @@ moveList Rook::getMoves(Board& board) {
             Position coord = {this->position.row, this->position.col - i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookLeft = false;
             } else {
                 lookLeft = false;
@@ -94,9 +94,9 @@ moveList Rook::getMoves(Board& board) {
             Position coord = {this->position.row, this->position.col + i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookRight = false;
             } else {
                 lookRight = false;
@@ -109,9 +109,9 @@ moveList Rook::getMoves(Board& board) {
             Position coord = {this->position.row + i, this->position.col};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookBottom = false;
             } else {
                 lookBottom = false;
@@ -138,9 +138,9 @@ moveList Bishop::getMoves(Board& board) {
             Position coord = {this->position.row - i, this->position.col + i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookTopRight = false;
             } else {
                 lookTopRight = false;
@@ -153,9 +153,9 @@ moveList Bishop::getMoves(Board& board) {
             Position coord = {this->position.row - i, this->position.col - i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookTopLeft = false;
             } else {
                 lookTopLeft = false;
@@ -168,9 +168,9 @@ moveList Bishop::getMoves(Board& board) {
             Position coord = {this->position.row + i, this->position.col + i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookBottomRight = false;
             } else {
                 lookBottomRight = false;
@@ -183,9 +183,9 @@ moveList Bishop::getMoves(Board& board) {
             Position coord = {this->position.row + i, this->position.col - i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookBottomLeft = false;
             } else {
                 lookBottomLeft = false;
@@ -217,9 +217,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row - i, this->position.col};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookTop = false;
             } else {
                 lookTop = false;
@@ -232,9 +232,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row, this->position.col - i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookLeft = false;
             } else {
                 lookLeft = false;
@@ -247,9 +247,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row, this->position.col + i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookRight = false;
             } else {
                 lookRight = false;
@@ -262,9 +262,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row + i, this->position.col};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookBottom = false;
             } else {
                 lookBottom = false;
@@ -278,9 +278,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row - i, this->position.col + i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookTopRight = false;
             } else {
                 lookTopRight = false;
@@ -293,9 +293,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row - i, this->position.col - i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookTopLeft = false;
             } else {
                 lookTopLeft = false;
@@ -308,9 +308,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row + i, this->position.col + i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookBottomRight = false;
             } else {
                 lookBottomRight = false;
@@ -323,9 +323,9 @@ moveList Queen::getMoves(Board& board) {
             Position coord = {this->position.row + i, this->position.col - i};
             Piece* piece = board.getPiece(coord);
             if (piece == nullptr) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
             } else if (piece->colour != this->colour) {
-                legalMoves.push_back({position, coord});
+                legalMoves.push_back(Move{.from=position, .to=coord});
                 lookBottomLeft = false;
             } else {
                 lookBottomLeft = false;
