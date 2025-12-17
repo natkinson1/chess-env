@@ -24,7 +24,21 @@ moveList Pawn::getMoves(Board& board) {
     Position coord = {this->position.row + direction, this->position.col};
     Piece* piece = board.getPiece(coord);
     if (piece == nullptr) {
-        legalMoves.push_back(Move{.from=position, .to=coord});
+        if (coord.row == 0 || coord.row == 7) {
+            // TODO: ADD move for each possible promotion type.
+            for (int newPieceEncoding : {
+                pieceType::BISHOP, 
+                pieceType::KNIGHT,
+                pieceType::ROOK, 
+                pieceType::QUEEN}) {
+                legalMoves.push_back(
+                    Move{.from=position, .to=coord, .newEncoding=newPieceEncoding}
+                );
+            }
+        } else {
+            legalMoves.push_back(Move{.from=position, .to=coord});
+        }
+        
     }
     // can take diagRight
     Position rightDiag = {this->position.row - direction, this->position.col + 1};
@@ -47,6 +61,7 @@ moveList Pawn::getMoves(Board& board) {
     }
     // en passen
     // if promotes
+
     return legalMoves;
 };
 

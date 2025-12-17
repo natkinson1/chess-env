@@ -145,6 +145,33 @@ void Board::move(Move& move, int player) {
         king->position = Position{.row=rank, .col=2};
         kingRook->position = Position{.row=rank, .col=3};
 
+    } else if (move.newEncoding != -1000) {
+        // pawn promotion
+        Piece* promotingPawn = this->getPiece(move.from);
+        promotingPawn->taken = true;
+        Position pos = {.row=move.to.row, .col=move.to.col};
+        switch(move.newEncoding) {
+            case pieceType::KNIGHT:
+                this->pieces.pieces.push_back(
+                    std::make_unique<Knight>(pos, player, rand())
+                );
+                break;
+            case pieceType::BISHOP:
+                this->pieces.pieces.push_back(
+                    std::make_unique<Bishop>(pos, player, rand())
+                );
+                break;
+            case pieceType::ROOK:
+                this->pieces.pieces.push_back(
+                    std::make_unique<Rook>(pos, player, rand())
+                );
+                break;
+            case pieceType::QUEEN:
+                this->pieces.pieces.push_back(
+                    std::make_unique<Queen>(pos, player, rand())
+                );
+                break;
+        }
     } else {
         for (auto& piece : pieces) {
             //piece is taken
@@ -159,13 +186,10 @@ void Board::move(Move& move, int player) {
             };
         };
     }
-
-
-    
 };
 
 void Board::undoMove(Move& move, int player) {
-
+    //TODO: Undo promotion move.
     if (move.castleKS) {
         int rank = (player == 1) ? 7 : 0;
         Piece* king = this->getKing(player);
@@ -180,7 +204,7 @@ void Board::undoMove(Move& move, int player) {
         Piece* kingRook = this->getPiece(Position{.row=rank, .col=3});
 
         king->position = Position{.row=rank, .col=4};
-        kingRook->position = Position{.row=rank, .col=7};
+        kingRook->position = Position{.row=rank, .col=0};
 
     } else {
         for (auto& piece : this->pieces) {

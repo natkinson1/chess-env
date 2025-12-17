@@ -21,8 +21,8 @@ struct Position {
 struct Move {
     Position from;
     Position to;
-    int newEncoding; // when a pawn promotes
-    int pieceTakenId = -1;
+    int newEncoding = -1000; // when a pawn promotes
+    int pieceTakenId = -1; // id -> Piece->id
     bool castleQS = false;
     bool castleKS = false;
     bool hasMoved; // store if piece has previously moved.
@@ -39,6 +39,15 @@ struct pieceList {
 
     auto begin() const {return pieces.begin();}
     auto end() const {return pieces.end();}
+};
+
+enum pieceType {
+    PAWN = 1,
+    BISHOP = 2,
+    KNIGHT = 3,
+    ROOK = 4,
+    QUEEN = 5,
+    KING = 6
 };
 
 class Piece {
