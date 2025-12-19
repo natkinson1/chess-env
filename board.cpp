@@ -44,41 +44,52 @@ boardEncoding Board::reset() {
     
     this->pieces.pieces.clear();
     this->pieces.pieces.reserve(32);
+    
 
-    // white pieces
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,0}, 1, false, 0));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,1}, 1, false, 1));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,2}, 1, false, 2));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,3}, 1, false, 3));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,4}, 1, false, 4));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,5}, 1, false, 5));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,6}, 1, false, 6));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,7}, 1, false, 7));
-    this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,0}, 1, false, 8));
-    this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,1}, 1, 9));
-    this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,2}, 1, 10));
-    this->pieces.pieces.push_back(std::make_unique<Queen>(Position{7,3}, 1, 11));
+    // // white pieces
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,0}, 1, false, 0));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,1}, 1, false, 1));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,2}, 1, false, 2));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,3}, 1, false, 3));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,4}, 1, false, 4));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,5}, 1, false, 5));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,6}, 1, false, 6));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{6,7}, 1, false, 7));
+    // this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,0}, 1, false, 8));
+    // this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,1}, 1, 9));
+    // this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,2}, 1, 10));
+    // this->pieces.pieces.push_back(std::make_unique<Queen>(Position{7,3}, 1, 11));
+    // this->pieces.pieces.push_back(std::make_unique<King>(Position{7,4}, 1, false, 12));
+    // this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,5}, 1, 13));
+    // this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,6}, 1, 14));
+    // this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,7}, 1, false, 15));
+    // // black pieces
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,0}, -1, false, 16));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,1}, -1, false, 17));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,2}, -1, false, 18));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,3}, -1, false, 19));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,4}, -1, false, 20));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,5}, -1, false, 21));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,6}, -1, false, 22));
+    // this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,7}, -1, false, 23));
+    // this->pieces.pieces.push_back(std::make_unique<Rook>(Position{0,0}, -1, false, 24));
+    // this->pieces.pieces.push_back(std::make_unique<Knight>(Position{0,1}, -1, 25));
+    // this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{0,2}, -1, 26));
+    // this->pieces.pieces.push_back(std::make_unique<Queen>(Position{0,3}, -1, 27));
+    // this->pieces.pieces.push_back(std::make_unique<King>(Position{0,4}, -1, false, 28));
+    // this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{0,5}, -1, 29));
+    // this->pieces.pieces.push_back(std::make_unique<Knight>(Position{0,6}, -1, 30));
+    // this->pieces.pieces.push_back(std::make_unique<Rook>(Position{0,7}, -1, false, 31));
+    // this->lastMove = Move{.from=Position{.row=0, .col=0}, .to=Position{.row=0, .col=0}, .pieceType=pieceType::PAWN};
+
+    this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,7}, 1, false, 5));
+    this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,0}, 1, false, 6));
+    this->pieces.pieces.push_back(std::make_unique<Rook>(Position{0,6}, -1, false, 7));
     this->pieces.pieces.push_back(std::make_unique<King>(Position{7,4}, 1, false, 12));
-    this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{7,5}, 1, 13));
-    this->pieces.pieces.push_back(std::make_unique<Knight>(Position{7,6}, 1, 14));
-    this->pieces.pieces.push_back(std::make_unique<Rook>(Position{7,7}, 1, false, 15));
-    // black pieces
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,0}, -1, false, 16));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,1}, -1, false, 17));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,2}, -1, false, 18));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,3}, -1, false, 19));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,4}, -1, false, 20));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,5}, -1, false, 21));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,6}, -1, false, 22));
-    this->pieces.pieces.push_back(std::make_unique<Pawn>(Position{1,7}, -1, false, 23));
-    this->pieces.pieces.push_back(std::make_unique<Rook>(Position{0,0}, -1, false, 24));
-    this->pieces.pieces.push_back(std::make_unique<Knight>(Position{0,1}, -1, 25));
-    this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{0,2}, -1, 26));
-    this->pieces.pieces.push_back(std::make_unique<Queen>(Position{0,3}, -1, 27));
     this->pieces.pieces.push_back(std::make_unique<King>(Position{0,4}, -1, false, 28));
-    this->pieces.pieces.push_back(std::make_unique<Bishop>(Position{0,5}, -1, 29));
-    this->pieces.pieces.push_back(std::make_unique<Knight>(Position{0,6}, -1, 30));
-    this->pieces.pieces.push_back(std::make_unique<Rook>(Position{0,7}, -1, false, 31));
+
+    Move lastMove = Move{.from=Position{.row=1, .col=4}, .to=Position{.row=3, .col=4}, .pieceType=pieceType::PAWN};
+    this->lastMove = lastMove;
 
     return this->board;
 };

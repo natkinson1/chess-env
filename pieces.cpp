@@ -61,7 +61,7 @@ moveList Pawn::getMoves(Board& board) {
     }
     // en passent
     Move lastMove = board.lastMove;
-    bool movedTwo = (lastMove.from.row - lastMove.to.row) * this->colour == 2;
+    bool movedTwo = (lastMove.to.row - lastMove.from.row) * this->colour == 2;
     bool isPawn = lastMove.pieceType == pieceType::PAWN;
     if (isPawn && movedTwo) {
         // look left
