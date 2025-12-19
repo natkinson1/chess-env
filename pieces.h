@@ -21,11 +21,13 @@ struct Position {
 struct Move {
     Position from;
     Position to;
+    int pieceType;
     int newEncoding = -1000; // when a pawn promotes
     int pieceTakenId = -1; // id -> Piece->id
     bool castleQS = false;
     bool castleKS = false;
     bool hasMoved; // store if piece has previously moved.
+    bool enPassent = false;
 };
 
 struct moveList : public std::vector<Move> {
@@ -53,7 +55,9 @@ enum pieceType {
 class Piece {
 protected:
 public:
-    int id;
+    int id = -1000;
+    int type;
+    int direction;
     Position position;
     int encoding = -1000;
     int colour;
@@ -66,11 +70,11 @@ public:
 class Pawn : public Piece {
 private:
     bool hasMoved;
-    int direction;
 public:
-    Pawn(Position pos, int colour, bool hasMoved, int id):
-    direction(colour * -1) {
+    Pawn(Position pos, int colour, bool hasMoved, int id) {
+        this->type = pieceType::PAWN;
         this->position = pos;
+        this->direction = colour * -1;
         this->colour = colour;
         this->hasMoved = hasMoved;
         this->encoding = 1 * colour;
@@ -84,6 +88,7 @@ private:
     bool hasMoved;
 public:
     Rook(Position pos, int colour, bool hasMoved, int id) {
+        this->type = pieceType::ROOK;
         this->position = pos;
         this->colour = colour;
         this->hasMoved = hasMoved;
@@ -97,6 +102,7 @@ class Bishop : public Piece {
 private:
 public:
     Bishop(Position pos, int colour, int id) {
+        this->type = pieceType::BISHOP;
         this->position = pos;
         this->colour = colour;
         this->encoding = 2 * colour;
@@ -109,6 +115,7 @@ class Queen : public Piece {
 private:
 public:
     Queen(Position pos, int colour, int id) {
+        this->type = pieceType::QUEEN;
         this->position = pos;
         this->colour = colour;
         this->encoding = 5 * colour;
@@ -121,6 +128,7 @@ class Knight : public Piece {
 private:
 public:
     Knight(Position pos, int colour, int id) {
+        this->type = pieceType::KNIGHT;
         this->position = pos;
         this->colour = colour;
         this->encoding = 3 * colour;
@@ -134,6 +142,7 @@ private:
     bool hasMoved;
 public:
     King(Position pos, int colour, bool hasMoved, int id) {
+        this->type = pieceType::KING;
         this->position = pos;
         this->colour = colour;
         this->hasMoved = hasMoved;

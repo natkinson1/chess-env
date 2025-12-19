@@ -68,5 +68,4 @@ std::tuple<std::vector<std::vector<int>>, int> Environment::reset() {
 void Environment::loadState(pieceList& pieces) {
     this->pieces.pieces.clear();
     this->pieces = std::move(pieces);
-    this->board.arrangeBoard(this->pieces);
 }

@@ -33,30 +33,12 @@ struct boardEncoding: public std::vector<std::vector<int>> {
 
 class Board {
 protected:
+    int pieceIdCounter = 32;
     boardEncoding board;
     pieceList pieces;
     pieceList takenPieces;
-    boardEncoding startingBoard = {
-        {-4, -3, -2, -5, -6, -2, -3, -4},
-        {-1, -1, -1, -1, -1, -1, -1, -1},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 1, 1, 1, 1, 1, 1},
-        {4, 3, 2, 5, 6, 2, 3, 4},
-    };
-    boardEncoding emptyBoard = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-    };
 public:
+    Move lastMove;
     boardEncoding reset();
     moveList getMoves(int player);
     moveList getAllActions(int player);
