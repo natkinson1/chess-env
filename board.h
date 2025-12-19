@@ -5,6 +5,7 @@
 #include <memory>
 #include <tuple>
 #include "pieces.h"
+#include <array>
 
 class Piece;
 
@@ -35,11 +36,14 @@ class Board {
 protected:
     int pieceIdCounter = 32;
     boardEncoding board;
-    pieceList pieces;
     pieceList takenPieces;
 public:
+    pieceList pieces;
     Move lastMove;
-    boardEncoding reset();
+    std::array<int, 6> pieceCountWhite = {0};
+    std::array<int, 6> pieceCountBlack = {0};
+    int move50rule = 0;
+    void reset();
     moveList getMoves(int player);
     moveList getAllActions(int player);
     moveList getLegalActions(moveList moves, int player);
@@ -52,6 +56,10 @@ public:
     void clearBoard();
     void arrangeBoard(pieceList& pieces);
     bool inCheck(int player);
+    bool isCheckMate(int player);
+    bool isStaleMate(int player);
+    bool drawByInsufficientMaterial(int player);
+    bool drawBy50MoveRule();
 };
 
 #endif

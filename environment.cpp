@@ -11,6 +11,11 @@ std::unordered_map<std::string, int> player = {
     {"white", 1}
 };
 
+enum playerColour {
+    WHITE = 1,
+    BLACK = -1
+};
+
 std::unordered_map<std::string, int> pieceEncoding = {
     {"pawn", 1},
     {"bishop", 2},
@@ -60,12 +65,12 @@ std::vector<std::vector<std::vector<int>>> board = {
 
 std::tuple<std::vector<std::vector<int>>, int> Environment::reset() {
     
-    std::vector<std::vector<int>> state = this->board.reset();
+    this->board.reset();
 
     return {state, 1};
 }
 
 void Environment::loadState(pieceList& pieces) {
     this->pieces.pieces.clear();
-    this->pieces = std::move(pieces);
+    this->board.pieces = std::move(pieces);
 }

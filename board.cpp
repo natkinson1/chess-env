@@ -40,7 +40,7 @@
 //     {{7,0}, {7,1}, {7,2}, {7,3}, {7,4}, {7,5}, {7,6}, {7,7}},
 // };
 
-boardEncoding Board::reset() {
+void Board::reset() {
     
     this->pieces.pieces.clear();
     this->pieces.pieces.reserve(32);
@@ -90,8 +90,7 @@ boardEncoding Board::reset() {
 
     Move lastMove = Move{.from=Position{.row=1, .col=4}, .to=Position{.row=3, .col=4}, .pieceType=pieceType::PAWN};
     this->lastMove = lastMove;
-
-    return this->board;
+    this->pieceCountWhite = {};
 };
 
 moveList Board::getMoves(int player) {
@@ -168,6 +167,7 @@ void Board::move(Move& move, int player) {
                 break;
             }
         }
+        this->move50rule = 0;
     } else if (move.newEncoding != -1000) {
         // pawn promotion
         Piece* promotingPawn = this->getPiece(move.from);
@@ -178,42 +178,48 @@ void Board::move(Move& move, int player) {
                 this->pieces.pieces.push_back(
                     std::make_unique<Knight>(pos, player, this->pieceIdCounter)
                 );
-                this->pieceIdCounter++;
+                this->pieceIdCounter+=1;
                 break;
             case pieceType::BISHOP:
                 this->pieces.pieces.push_back(
                     std::make_unique<Bishop>(pos, player, this->pieceIdCounter)
                 );
-                this->pieceIdCounter++;
+                this->pieceIdCounter+=1;
                 break;
             case pieceType::ROOK:
                 this->pieces.pieces.push_back(
                     std::make_unique<Rook>(pos, player, true, this->pieceIdCounter)
                 );
-                this->pieceIdCounter++;
+                this->pieceIdCounter+=1;
                 break;
             case pieceType::QUEEN:
                 this->pieces.pieces.push_back(
                     std::make_unique<Queen>(pos, player, this->pieceIdCounter)
                 );
-                this->pieceIdCounter++;
+                this->pieceIdCounter+=1;
                 break;
         }
+        this->move50rule = 0;
     } else {
         for (auto& piece : this->pieces) {
             //piece is taken
             if (piece->position == move.to && !piece->taken) {
                 piece->taken = true;
                 move.pieceTakenId = piece->id;
+                this->move50rule = 0;
             }
             if (piece->position == move.from && !piece->taken) {
                 move.hasMoved = piece->hasMoved;
                 piece->position = move.to;
                 piece->hasMoved = true;
+                if (piece->type == pieceType::PAWN) {
+                    this->move50rule = 0;
+                }
             };
         };
     }
     this->lastMove = move;
+    this->move50rule += 1;
 };
 
 void Board::undoMove(Move& move, int player) {
@@ -248,7 +254,7 @@ void Board::undoMove(Move& move, int player) {
         Piece* promotingPawn = this->getPiece(move.from);
         promotingPawn->taken = false;
         this->pieces.pieces.pop_back(); // remove newly made piece
-        this->pieceIdCounter--;
+        this->pieceIdCounter-=1;
     }
     
     else {
@@ -269,11 +275,15 @@ void Board::undoMove(Move& move, int player) {
 bool Board::isLegalMove(Move& move, int player) {
     // check if move causes piece to be in check.
     // check to see if other player can take king.
+    int oldmove50rule = this->move50rule;
     Move oldMove = this->lastMove;
+
     this->move(move, player);
     bool inCheck = this->inCheck(player);
     this->undoMove(move, player);
+
     this->lastMove = oldMove;
+    this->move50rule = oldmove50rule;
 
     return !inCheck;
 }
@@ -366,3 +376,33 @@ Piece* Board::getKing(int player) {
     return nullptr;
 }
 
+bool Board::isCheckMate(int player) {
+    moveList moves = this->getMoves(player);
+    bool inCheck = this->inCheck(player);
+
+    if (moves.size() == 0 && inCheck) {
+        return true;
+    }
+    return false;
+}
+
+bool Board::isStaleMate(int player) {
+    moveList moves = this->getMoves(player);
+    bool inCheck = this->inCheck(player);
+
+    if (moves.size() == 0 && !inCheck) {
+        return true;
+    }
+    return false;
+}
+
+bool Board::drawByInsufficientMaterial(int player) {
+
+}
+
+bool Board::drawBy50MoveRule() {
+    if (this->move50rule >= 50) {
+        return true;
+    }
+    return false;
+}
