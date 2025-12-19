@@ -201,12 +201,18 @@ void Board::undoMove(Move& move, int player) {
     } else if (move.castleQS) {
         int rank = (player == 1) ? 7 : 0;
         Piece* king = this->getKing(player);
-        Piece* kingRook = this->getPiece(Position{.row=rank, .col=3});
+        Piece* queenRook = this->getPiece(Position{.row=rank, .col=3});
 
         king->position = Position{.row=rank, .col=4};
-        kingRook->position = Position{.row=rank, .col=0};
+        queenRook->position = Position{.row=rank, .col=0};
 
-    } else {
+    } else if (move.newEncoding != -1000) {
+        Piece* promotingPawn = this->getPiece(move.from);
+        promotingPawn->taken = false;
+        this->pieces.pieces.pop_back(); // remove newly made piece
+    }
+    
+    else {
         for (auto& piece : this->pieces) {
             //undo piece taken
             if (piece->id == move.pieceTakenId) {
@@ -220,7 +226,6 @@ void Board::undoMove(Move& move, int player) {
         };
     }
     
-
 };
 
 bool Board::isLegalMove(Move& move, int player) {
@@ -262,6 +267,19 @@ moveList Board::castlingMoves(int player) {
     if (king->hasMoved) {
         return allMoves;
     }
+    // see if king moves through check
+    bool movesThroughCheckKS = false;
+    bool movesThroughCheckQS = false;
+    moveList opponentMoves = this->getAllActions(player * -1);
+    for (Move move : opponentMoves) {
+        //king side
+        if (move.from == Position{.row=rank, .col=5} || move.from == Position{.row=rank, .col=6}) {
+            movesThroughCheckKS = true;
+        }
+        if (move.from == Position{.row=rank, .col=3} || move.from == Position{.row=rank, .col=2}) {
+            movesThroughCheckQS = true;
+        }
+    }
     //check kingside
     Position pos1 = {.row=rank, .col=7};
     Piece* kingRook = this->getPiece(pos1);
@@ -273,7 +291,7 @@ moveList Board::castlingMoves(int player) {
         }
     }
 
-    if (kingRook != nullptr && kingRook->encoding == rookEncoding && !kingRook->hasMoved && isClearRight) {
+    if (kingRook != nullptr && kingRook->encoding == rookEncoding && !kingRook->hasMoved && isClearRight && !movesThroughCheckKS) {
         Move move = {.castleKS=true};
         allMoves.push_back(move);
     }
@@ -289,7 +307,7 @@ moveList Board::castlingMoves(int player) {
         }
     }
 
-    if (queenRook != nullptr && queenRook->encoding == rookEncoding && !queenRook->hasMoved && isClearLeft) {
+    if (queenRook != nullptr && queenRook->encoding == rookEncoding && !queenRook->hasMoved && isClearLeft && !movesThroughCheckQS) {
         Move move = {.castleQS=true};
         allMoves.push_back(move);
     }
