@@ -2,8 +2,8 @@ CFLAGS = -g -Wall -Wextra -pedantic
 
 all: main
 
-main: main.o board.o pieces.o environment.o
-	g++ main.o board.o pieces.o environment.o -o main
+main: main.o board.o pieces.o environment.o algebraicNotation.o
+	g++ main.o board.o pieces.o environment.o algebraicNotation.o -o main
 
 main.o: main.cpp
 	g++ -c main.cpp -g
@@ -16,6 +16,9 @@ pieces.o: pieces.cpp pieces.h
 
 environment.o: environment.cpp environment.h
 	g++ -c environment.cpp -g
+
+algebraicNotation.o: algebraicNotation.cpp algebraicNotation.h
+	g++ -c algebraicNotation.cpp -g
 
 # Test target
 test: tests/test_runner

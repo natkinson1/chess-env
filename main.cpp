@@ -4,11 +4,16 @@
 
 int main() {
     Environment env;
+    auto [terminal, reward] = env.reset();
 
-    auto [state, player] = env.reset();
+    int i = 0;
+    while (i < 100 && !terminal) {
+        moveList moves = env.getActions();
+        Move move = moves[rand() % moves.size()];
+        auto [terminal, reward] = env.step(move);
+        i++;
+    }
 
-    moveList moves = env.board.getMoves(player);
-
-    std::cout << "Number of moves for player 1: " << moves.size() << std::endl;
+    std::cout << "Game finished";
 
 }

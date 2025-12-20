@@ -13,6 +13,7 @@ public:
     pieceList pieces;
     int currentPlayer;
     moveList gameMoves;
+    int moveNum = 1;
     std::tuple<bool, int> reset();
     std::tuple<bool, int> step(Move move);
     moveList getActions();

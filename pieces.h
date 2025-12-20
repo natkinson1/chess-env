@@ -21,7 +21,7 @@ struct Position {
 struct Move {
     Position from;
     Position to;
-    int pieceType;
+    int pieceType; // pieceType of the moving piece
     int newEncoding = -1000; // when a pawn promotes
     int pieceTakenId = -1; // id -> Piece->id
     bool castleQS = false;
@@ -67,14 +67,13 @@ public:
     int encoding = -1000;
     int colour;
     bool taken = false;
-    bool hasMoved = false;
+    bool hasMoved;
     virtual moveList getMoves(Board& board) = 0;
     virtual ~Piece() = default;
 };
 
 class Pawn : public Piece {
 private:
-    bool hasMoved;
 public:
     Pawn(Position pos, int colour, bool hasMoved, int id) {
         this->type = pieceType::PAWN;
@@ -90,7 +89,6 @@ public:
 
 class Rook : public Piece {
 private:
-    bool hasMoved;
 public:
     Rook(Position pos, int colour, bool hasMoved, int id) {
         this->type = pieceType::ROOK;
@@ -144,7 +142,6 @@ public:
 
 class King : public Piece {
 private:
-    bool hasMoved;
 public:
     King(Position pos, int colour, bool hasMoved, int id) {
         this->type = pieceType::KING;
