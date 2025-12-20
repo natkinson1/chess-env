@@ -58,7 +58,7 @@ public:
     bool inCheck(int player);
     bool isCheckMate(int player);
     bool isStaleMate(int player);
-    bool drawByInsufficientMaterial(int player);
+    bool drawByInsufficientMaterial();
     bool drawBy50MoveRule();
     void takePiece(Piece* piece);
     void undoTakePiece(Piece* piece);

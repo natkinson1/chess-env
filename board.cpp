@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-// #include <algorithm>
 #include "pieces.h"
 #include "board.h"
 
@@ -99,6 +96,12 @@ moveList Board::getMoves(int player) {
 
     moveList allLegalMoves = this->getLegalActions(allMoves, player);
     moveList castleMoves = this->castlingMoves(player);
+
+    allLegalMoves.insert(
+        allLegalMoves.end(),
+        castleMoves.begin(),
+        castleMoves.end()
+    );
 
     return allLegalMoves;
 }
@@ -403,39 +406,33 @@ bool Board::isStaleMate(int player) {
     return false;
 }
 
-bool Board::drawByInsufficientMaterial(int player) {
+bool Board::drawByInsufficientMaterial() {
     bool insufficientMaterialWhite = false;
     bool insufficientMaterialBlack = false;
     std::array<int, 6> oneBishopOnly = {0,0,1,0,0,0};
     std::array<int, 6> oneKnightOnly = {0,0,0,1,0,0};
     std::array<int, 6> twoKnightsOnly = {0,0,0,2,0,0};
     std::array<int, 6> noPieces = {0,0,0,0,0,0};
-    if (player == pieceColour::WHITE) {
-        // 1 bishop only
-        if(this->pieceCountWhite == oneBishopOnly) {
-            insufficientMaterialWhite = true;
-        } else if (this->pieceCountWhite == oneKnightOnly) {
-            insufficientMaterialWhite = true;
-        } else if (this->pieceCountWhite == twoKnightsOnly && this->pieceCountBlack == noPieces) {
-            insufficientMaterialWhite = true;
-            insufficientMaterialBlack = true;
-        } else if (this->pieceCountWhite == noPieces) {
-            insufficientMaterialWhite = true;
-        }
-    }
 
-    if (player == pieceColour::BLACK) {
-        // 1 bishop only
-        if(this->pieceCountBlack == oneBishopOnly) {
-            insufficientMaterialBlack = true;
-        } else if (this->pieceCountBlack == oneKnightOnly) {
-            insufficientMaterialBlack = true;
-        } else if (this->pieceCountBlack == twoKnightsOnly && this->pieceCountWhite == noPieces) {
-            insufficientMaterialWhite = true;
-            insufficientMaterialBlack = true;
-        } else if (this->pieceCountBlack == noPieces) {
-            insufficientMaterialBlack = true;
-        }
+    if(this->pieceCountWhite == oneBishopOnly) {
+        insufficientMaterialWhite = true;
+    } else if (this->pieceCountWhite == oneKnightOnly) {
+        insufficientMaterialWhite = true;
+    } else if (this->pieceCountWhite == twoKnightsOnly && this->pieceCountBlack == noPieces) {
+        insufficientMaterialWhite = true;
+        insufficientMaterialBlack = true;
+    } else if (this->pieceCountWhite == noPieces) {
+        insufficientMaterialWhite = true;
+    } 
+    if(this->pieceCountBlack == oneBishopOnly) {
+        insufficientMaterialBlack = true;
+    } else if (this->pieceCountBlack == oneKnightOnly) {
+        insufficientMaterialBlack = true;
+    } else if (this->pieceCountBlack == twoKnightsOnly && this->pieceCountWhite == noPieces) {
+        insufficientMaterialWhite = true;
+        insufficientMaterialBlack = true;
+    } else if (this->pieceCountBlack == noPieces) {
+        insufficientMaterialBlack = true;
     }
     return insufficientMaterialWhite && insufficientMaterialBlack;
 }

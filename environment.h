@@ -11,7 +11,11 @@ private:
 public:
     Board board;
     pieceList pieces;
-    std::tuple<std::vector<std::vector<int>>, int> reset();
+    int currentPlayer;
+    moveList gameMoves;
+    std::tuple<bool, int> reset();
+    std::tuple<bool, int> step(Move move);
+    moveList getActions();
     void loadState(pieceList& pieces);
 };
 
