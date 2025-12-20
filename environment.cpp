@@ -11,11 +11,6 @@ std::unordered_map<std::string, int> player = {
     {"white", 1}
 };
 
-enum playerColour {
-    WHITE = 1,
-    BLACK = -1
-};
-
 std::unordered_map<std::string, int> pieceEncoding = {
     {"pawn", 1},
     {"bishop", 2},

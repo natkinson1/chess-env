@@ -52,6 +52,11 @@ enum pieceType {
     KING = 6
 };
 
+enum pieceColour {
+    WHITE = 1,
+    BLACK = -1
+};
+
 class Piece {
 protected:
 public:

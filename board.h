@@ -60,6 +60,10 @@ public:
     bool isStaleMate(int player);
     bool drawByInsufficientMaterial(int player);
     bool drawBy50MoveRule();
+    void takePiece(Piece* piece);
+    void undoTakePiece(Piece* piece);
+    void incrementPieceCount(int pieceColour, int pieceType);
+    void decrementPieceCount(int pieceColour, int pieceType);
 };
 
 #endif
