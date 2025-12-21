@@ -26,9 +26,10 @@ std::tuple<bool, int> Environment::reset() {
     return {false, 0}; // terminal, reward
 }
 
-std::tuple<bool, int> Environment::step(Move move) {
+std::tuple<bool, int, std::string> Environment::step(Move move) {
     bool terminal;
     int reward;
+    std::string reason = "";
     this->board.move(move, this->currentPlayer);
     bool isCheckMate = this->board.isCheckMate(this->currentPlayer * -1);
     bool isStaleMate = this->board.isStaleMate(this->currentPlayer * -1);
@@ -38,15 +39,19 @@ std::tuple<bool, int> Environment::step(Move move) {
     if (isCheckMate) {
         terminal = true;
         reward = (this->currentPlayer == pieceColour::WHITE) ? 1 : -1;
+        reason = "checkmate";
     } else if (isStaleMate) {
         terminal = true;
         reward = 0;
+        reason = "stalemate";
     } else if (is50MoveRule) {
         terminal = true;
         reward = 0;
+        reason = "50 move rule";
     } else if (isinsufficientMaterial) {
         terminal = true;
         reward = 0;
+        reason = "insufficient material";
     }
     this->gameMoves.push_back(
         move
@@ -54,7 +59,7 @@ std::tuple<bool, int> Environment::step(Move move) {
     this->currentPlayer *= -1;
     std::cout << moveNum << "." << " " << getAlgebraicNotation(move) << " ";
     this->moveNum++;
-    return {terminal, reward};
+    return {terminal, reward, reason};
 }
 
 moveList Environment::getActions() {

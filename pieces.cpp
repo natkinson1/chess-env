@@ -11,8 +11,8 @@ moveList Pawn::getMoves(Board& board) {
     moveList legalMoves;
 
     if (!this->hasMoved) {
-        Position coord1 = {this->position.row + direction, this->position.col};
-        Position coord2 = {this->position.row + direction * 2, this->position.col};
+        Position coord1 = {this->position.row + this->direction, this->position.col};
+        Position coord2 = {this->position.row + this->direction * 2, this->position.col};
         Piece* piece1 = board.getPiece(coord1);
         Piece* piece2 = board.getPiece(coord2);
         Move move = {.from=this->position, .to=coord2};
@@ -21,7 +21,7 @@ moveList Pawn::getMoves(Board& board) {
         };
     };
     // can move 1 forward
-    Position coord = {this->position.row + direction, this->position.col};
+    Position coord = {this->position.row + this->direction, this->position.col};
     Piece* piece = board.getPiece(coord);
     if (piece == nullptr) {
         // add promoting moves
@@ -41,22 +41,47 @@ moveList Pawn::getMoves(Board& board) {
         
     }
     // can take diagRight
-    Position rightDiag = {this->position.row - direction, this->position.col + 1};
-    if (rightDiag.row > 0 && rightDiag.row <= 7 && rightDiag.col <= 7) {
+    Position rightDiag = {this->position.row + this->direction, this->position.col + 1};
+    if (rightDiag.row >= 0 && rightDiag.row <= 7 && rightDiag.col <= 7) {
         Piece* piece = board.getPiece(rightDiag);
         if (piece == nullptr) {
         } else if (piece->colour != this->colour) {
-            legalMoves.push_back(Move{.from=this->position, .to=rightDiag, .pieceType=pieceType::PAWN});
+            if (rightDiag.row == 0 || rightDiag.row == 7) {
+                for (int newPieceEncoding : {
+                    pieceType::BISHOP, 
+                    pieceType::KNIGHT,
+                    pieceType::ROOK, 
+                    pieceType::QUEEN}) {
+                    legalMoves.push_back(
+                        Move{.from=this->position, .to=rightDiag, .pieceType=pieceType::PAWN, .newEncoding=newPieceEncoding}
+                    );
+                }
+            } else {
+                legalMoves.push_back(Move{.from=this->position, .to=rightDiag, .pieceType=pieceType::PAWN});
+            }
         };
     };
     
     // can take diagLeft
-    Position leftDiag = {this->position.row - direction, this->position.col - 1};
-    if (leftDiag.row > 0 && leftDiag.row < 8 && leftDiag.col > 0) {
+    Position leftDiag = {this->position.row + this->direction, this->position.col - 1};
+    if (leftDiag.row >= 0 && leftDiag.row <= 7 && leftDiag.col >= 0) {
         Piece* piece = board.getPiece(leftDiag);
         if (piece == nullptr) {
         } else if (piece->colour != this->colour) {
-            legalMoves.push_back(Move{.from=this->position, .to=leftDiag, .pieceType=pieceType::PAWN});
+            if (leftDiag.row == 0 || leftDiag.row==7) {
+                for (int newPieceEncoding : {
+                    pieceType::BISHOP, 
+                    pieceType::KNIGHT,
+                    pieceType::ROOK, 
+                    pieceType::QUEEN}) {
+                    legalMoves.push_back(
+                        Move{.from=this->position, .to=leftDiag, .pieceType=pieceType::PAWN, .newEncoding=newPieceEncoding}
+                    );
+                }
+            } else {
+                legalMoves.push_back(Move{.from=this->position, .to=leftDiag, .pieceType=pieceType::PAWN});
+            }
+            
         }
     }
     // en passent
@@ -414,7 +439,7 @@ moveList King::getMoves(Board& board) {
     Position topRight = {this->position.row - 1, this->position.col + 1};
     Position topLeft = {this->position.row - 1, this->position.col - 1};
     Position bottomRight = {this->position.row + 1, this->position.col + 1};
-    Position bottomLeft = {this->position.row + 1, this->position.col + 1};
+    Position bottomLeft = {this->position.row + 1, this->position.col - 1};
     std::vector<Position> allMoves = {
         top, right, left, bottom, topRight, topLeft, bottomRight, bottomLeft
     };

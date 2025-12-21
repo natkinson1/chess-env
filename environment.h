@@ -15,7 +15,7 @@ public:
     moveList gameMoves;
     int moveNum = 1;
     std::tuple<bool, int> reset();
-    std::tuple<bool, int> step(Move move);
+    std::tuple<bool, int, std::string> step(Move move);
     moveList getActions();
     void loadState(pieceList& pieces);
 };

@@ -44,8 +44,8 @@ void Board::reset() {
     this->lastMove = Move{.from=Position{.row=0, .col=0}, .to=Position{.row=0, .col=0}, .pieceType=pieceType::PAWN};
 
     // pawn, bishop, knight, rook, queen
-    this->pieceCountWhite = {0, 8, 2, 2, 1};
-    this->pieceCountBlack = {0, 8, 2, 2, 1};
+    this->pieceCountWhite = {0, 8, 2, 2, 2, 1};
+    this->pieceCountBlack = {0, 8, 2, 2, 2, 1};
 };
 
 moveList Board::getMoves(int player) {
@@ -121,6 +121,7 @@ void Board::move(Move& move, int player) {
             if (piece->position == move.from && !piece->taken) {
                 move.hasMoved = piece->hasMoved;
                 piece->position = move.to;
+                move.movedPieceId = piece->id;
                 piece->hasMoved = true;
                 Piece* takenPiece = this->getPiece(Position{.row=piece->position.row - piece->direction, .col=move.to.col});
                 this->takePiece(takenPiece);
@@ -132,34 +133,38 @@ void Board::move(Move& move, int player) {
     } else if (move.newEncoding != -1000) {
         // pawn promotion
         Piece* promotingPawn = this->getPiece(move.from);
+        move.movedPieceId = promotingPawn->id;
         this->takePiece(promotingPawn);
-        move.pieceTakenId = promotingPawn->id;
-        Position pos = {.row=move.to.row, .col=move.to.col};
+        Piece* takenPiece = this->getPiece(move.to);
+        if (takenPiece) {
+            move.pieceTakenId = takenPiece->id;
+            this->takePiece(takenPiece);
+        }
         switch(move.newEncoding) {
             case pieceType::BISHOP:
                 this->pieces.pieces.push_back(
-                    std::make_unique<Bishop>(pos, player, this->pieceIdCounter)
+                    std::make_unique<Bishop>(move.to, player, this->pieceIdCounter)
                 );
                 this->pieceIdCounter+=1;
                 this->incrementPieceCount(player, 2);
                 break;
             case pieceType::KNIGHT:
                 this->pieces.pieces.push_back(
-                    std::make_unique<Knight>(pos, player, this->pieceIdCounter)
+                    std::make_unique<Knight>(move.to, player, this->pieceIdCounter)
                 );
                 this->pieceIdCounter+=1;
                 this->incrementPieceCount(player, 3);
                 break;
             case pieceType::ROOK:
                 this->pieces.pieces.push_back(
-                    std::make_unique<Rook>(pos, player, true, this->pieceIdCounter)
+                    std::make_unique<Rook>(move.to, player, true, this->pieceIdCounter)
                 );
                 this->pieceIdCounter+=1;
                 this->incrementPieceCount(player, 4);
                 break;
             case pieceType::QUEEN:
                 this->pieces.pieces.push_back(
-                    std::make_unique<Queen>(pos, player, this->pieceIdCounter)
+                    std::make_unique<Queen>(move.to, player, this->pieceIdCounter)
                 );
                 this->pieceIdCounter+=1;
                 this->incrementPieceCount(player, 5);
@@ -178,6 +183,7 @@ void Board::move(Move& move, int player) {
                 move.hasMoved = piece->hasMoved;
                 piece->position = move.to;
                 piece->hasMoved = true;
+                move.movedPieceId = piece->id;
                 if (piece->type == pieceType::PAWN) {
                     this->move50rule = 0;
                 }
@@ -208,7 +214,7 @@ void Board::undoMove(Move& move, int player) {
 
     } else if (move.enPassent) {
         for (auto& piece: this->pieces) {
-            if (piece->position == move.to && !piece->taken) {
+            if (move.movedPieceId == piece->id) {
                 piece->hasMoved = move.hasMoved;
                 piece->position = move.from;
             }
@@ -220,11 +226,11 @@ void Board::undoMove(Move& move, int player) {
         for (auto& piece: this->pieces) {
             if (piece->id == move.pieceTakenId) {
                 this->undoTakePiece(piece.get());
-                break;
+            } else if (piece->id == move.movedPieceId) {
+                this->undoTakePiece(piece.get());
             }
         }
-        Piece* promotingPawn = this->getPiece(move.from);
-        this->undoTakePiece(promotingPawn);
+        
         Piece* promotedPiece = this->pieces.pieces.back().get();
         this->decrementPieceCount(promotedPiece->colour, promotedPiece->type);
         this->pieces.pieces.pop_back(); // remove newly made piece
@@ -238,7 +244,7 @@ void Board::undoMove(Move& move, int player) {
                 this->undoTakePiece(piece.get());
                 move.pieceTakenId = -1;
             }
-            if (piece->position == move.to && !piece->taken) {
+            if (piece->id == move.movedPieceId) {
                 piece->position = move.from;
                 piece->hasMoved = move.hasMoved; // restore hasMoved state
             };
@@ -296,11 +302,11 @@ moveList Board::castlingMoves(int player) {
     moveList opponentMoves = this->getAllActions(player * -1);
     for (Move move : opponentMoves) {
         // king side
-        if (move.to == Position{.row=rank, .col=5} || move.to == Position{.row=rank, .col=6}) {
+        if (move.to == Position{.row=rank, .col=4} || move.to == Position{.row=rank, .col=5} || move.to == Position{.row=rank, .col=6}) {
             movesThroughCheckKS = true;
         }
         // queen side
-        if (move.to == Position{.row=rank, .col=3} || move.to == Position{.row=rank, .col=2}) {
+        if (move.to == Position{.row=rank, .col=4} || move.to == Position{.row=rank, .col=3} || move.to == Position{.row=rank, .col=2}) {
             movesThroughCheckQS = true;
         }
     }
@@ -308,12 +314,18 @@ moveList Board::castlingMoves(int player) {
     Position pos1 = {.row=rank, .col=7};
     Piece* kingRook = this->getPiece(pos1);
     if (kingRook != nullptr) {
-        moveList kingRookMoves = kingRook->getMoves(*this);
-        bool isClearRight = false;
-        for (Move move : kingRookMoves) {
-            if (move.to == Position{king->position.row, king->position.col + 1}) {
-                isClearRight = true;
+        // moveList kingRookMoves = kingRook->getMoves(*this);
+        bool isClearRight = true;
+        for (auto& piece : this->pieces) {
+            if (piece->taken) {
+                continue;
+            } else {
+                if (piece->position == Position{king->position.row, king->position.col + 1} || 
+                    piece->position == Position{king->position.row, king->position.col + 2}) {
+                    isClearRight = false;
+                }
             }
+            
         }
 
         if (kingRook->encoding == rookEncoding && !kingRook->hasMoved && isClearRight && !movesThroughCheckKS) {
@@ -327,11 +339,17 @@ moveList Board::castlingMoves(int player) {
     Position pos2 = {.row=rank, .col=0};
     Piece* queenRook = this->getPiece(pos2);
     if (queenRook != nullptr) {
-        moveList queenRookMoves = queenRook->getMoves(*this);
-        bool isClearLeft = false;
-        for (Move move : queenRookMoves) {
-            if (move.to == Position{king->position.row, king->position.col - 1}) {
-                isClearLeft = true;
+        // moveList queenRookMoves = queenRook->getMoves(*this);
+        bool isClearLeft = true;
+        for (auto& piece : this->pieces) {
+            if (piece->taken) {
+                continue;
+            } else {
+                if (piece->position == Position{king->position.row, king->position.col - 1} || 
+                    piece->position == Position{king->position.row, king->position.col - 2} ||
+                    piece->position == Position{king->position.row, king->position.col - 3}) {
+                    isClearLeft = false;
+                }
             }
         }
 
@@ -418,33 +436,33 @@ bool Board::drawBy50MoveRule() {
 void Board::takePiece(Piece* piece) {
     piece->taken = true;
     if (piece->colour == pieceColour::WHITE) {
-        this->pieceCountWhite[piece->type - 1] -= 1;
+        this->pieceCountWhite[piece->type] -= 1;
     } else {
-        this->pieceCountBlack[piece->type - 1] -= 1;
+        this->pieceCountBlack[piece->type] -= 1;
     }
 };
 
 void Board::undoTakePiece(Piece* piece) {
     piece->taken = false;
     if (piece->colour == pieceColour::WHITE) {
-        this->pieceCountWhite[piece->type - 1] += 1;
+        this->pieceCountWhite[piece->type] += 1;
     } else {
-        this->pieceCountBlack[piece->type - 1] += 1;
+        this->pieceCountBlack[piece->type] += 1;
     }
 };
 
 void Board::incrementPieceCount(int pieceColour, int pieceType) {
     if (pieceColour == pieceColour::WHITE) {
-        this->pieceCountWhite[pieceType - 1] += 1;
+        this->pieceCountWhite[pieceType] += 1;
     } else {
-        this->pieceCountBlack[pieceType - 1] += 1;
+        this->pieceCountBlack[pieceType] += 1;
     }
 };
 
 void Board::decrementPieceCount(int pieceColour, int pieceType) {
     if (pieceColour == pieceColour::WHITE) {
-        this->pieceCountWhite[pieceType - 1] -= 1;
+        this->pieceCountWhite[pieceType] -= 1;
     } else {
-        this->pieceCountBlack[pieceType - 1] -= 1;
+        this->pieceCountBlack[pieceType] -= 1;
     }
 }

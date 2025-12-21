@@ -24,6 +24,7 @@ struct Move {
     int pieceType; // pieceType of the moving piece
     int newEncoding = -1000; // when a pawn promotes
     int pieceTakenId = -1; // id -> Piece->id
+    int movedPieceId = -1;
     bool castleQS = false;
     bool castleKS = false;
     bool hasMoved; // store if piece has previously moved.
